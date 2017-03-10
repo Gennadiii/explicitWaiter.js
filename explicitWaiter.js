@@ -15,14 +15,11 @@ function _timeNotSpecified() {
     throw new Error(`waitReady didn't get obligatory wait time argument`)
 }
 
-function waitForElementToBePresentAndDisplayed(element, explicitWaitTime) {
+function _waitForElementToBePresentAndDisplayed(element, explicitWaitTime) {
     return browser.wait(function () {
         return element.isPresent()
-            .then(present => {
-                return !present ? false :
-                    element.isDisplayed()
-                        .then(displayed => displayed);
-            });
+            .then(present => !present ? false : element.isDisplayed())
+            .then(displayed => displayed);
     }, explicitWaitTime)
 }
 
