@@ -16,16 +16,14 @@ function _timeNotSpecified() {
 }
 
 function _waitForElementToBePresentAndDisplayed(element, explicitWaitTime) {
-    return browser.wait(function () {
-        return element.isPresent()
+    return browser.wait(() => element.isPresent()
             .then(present => !present ? false : element.isDisplayed())
-            .then(displayed => displayed);
     }, explicitWaitTime)
 }
 
 function explicitlyWait(element, explicitWaitTime) {
     _setImplicitWaitTime(0);
-    return waitForElementToBePresentAndDisplayed(element, explicitWaitTime)
+    return _waitForElementToBePresentAndDisplayed(element, explicitWaitTime)
         .then(present => {
             setTimeout(() => _setImplicitWaitTime(implicitWaitTime), 1);
             return true;
