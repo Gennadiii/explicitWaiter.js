@@ -6,7 +6,7 @@ function _setImplicitWaitTime(time) {
     browser.manage().timeouts().implicitlyWait(time);
 }
 
-function _throwNoElementFoundError(element) {
+function _throghTimeNotSpecified(element) {
     throw new Error(`WaitReady expected element \
 ${element.locator().toString()} to be present and visible.`)
 }
@@ -22,7 +22,7 @@ function _waitForElementToBePresentAndDisplayed(element, explicitWaitTime) {
     }, explicitWaitTime)
 }
 
-function explicitlyWait(element, explicitWaitTime) {
+function _explicitlyWait(element, explicitWaitTime) {
     _setImplicitWaitTime(0);
     return _waitForElementToBePresentAndDisplayed(element, explicitWaitTime)
         .then(present => {
@@ -36,8 +36,8 @@ function explicitlyWait(element, explicitWaitTime) {
 }
 
 ElementFinder.prototype.waitReady = function (explicitWaitTime) {
-    let explicitWaitTime = explicitWaitTime || _timeNotSpecified();
-    explicitlyWait(this, explicitWaitTime)
+    explicitWaitTime = explicitWaitTime || _throghTimeNotSpecified();
+    _explicitlyWait(this, explicitWaitTime)
         .then(elementIsVisible => {
             if (!elementIsVisible) _throwNoElementFoundError(this);
         });
