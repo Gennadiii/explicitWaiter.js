@@ -7,8 +7,8 @@ function _setImplicitWaitTime(time) {
 }
 
 function _throghTimeNotSpecified(element) {
-    throw new Error(`WaitReady expected element \
-${element.locator().toString()} to be present and visible.`)
+    throw new Error(`WaitReady expected element ` + 
+`${element.locator().toString()} to be present and visible.`)
 }
 
 function _timeNotSpecified() {
@@ -16,8 +16,8 @@ function _timeNotSpecified() {
 }
 
 function _waitForElementToBePresentAndDisplayed(element, explicitWaitTime) {
-    return browser.wait(function () {
-        element.isPresent()
+    return browser.wait(() => {
+        return element.isPresent()
             .then(present => !present ? false : element.isDisplayed());
     }, explicitWaitTime)
 }
