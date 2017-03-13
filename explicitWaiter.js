@@ -16,8 +16,9 @@ function _timeNotSpecified() {
 }
 
 function _waitForElementToBePresentAndDisplayed(element, explicitWaitTime) {
-    return browser.wait(() => element.isPresent()
-            .then(present => !present ? false : element.isDisplayed())
+    return browser.wait(function () {
+        element.isPresent()
+            .then(present => !present ? false : element.isDisplayed());
     }, explicitWaitTime)
 }
 
