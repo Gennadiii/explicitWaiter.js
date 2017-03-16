@@ -1,45 +1,34 @@
-const implicitWaitTime = 3000,
-    ElementFinder = $('').constructor;
+// Notice that webdriver does not provide implicitWait getter, you can only set it.
+// As a solution we could set implicit wait param into browser.params - https://github.com/angular/protractor/blob/master/lib/config.ts#L454
+const implicitWaitTime = browser.params.implicitWaitTimeout || 0;
 
-
-function _setImplicitWaitTime(time) {
-    browser.manage().timeouts().implicitlyWait(time);
+/**
+ * 
+ * Works like original webdriverjs wait function. 
+ * Except it will set implicit wait timeout to 0 before and
+ * will set it back to your browser.params.implicitWaitTimeout after wait will be finished
+ * 
+ * @throws same expections as original browser.wait would throw
+ * 
+ * @param {Function} predicate Predicate function (returns only true/false, no exceptions).
+ * This parameter is compatible with ExpectedConditions, so you could pass any of it, 
+ * or create own condition
+ * 
+ * @param {number} timeout Optional parameter, timeout in ms, how long to wait until throw TimeoutError. 
+ * If not set - will wait forever (same logic as protractor do)
+ * 
+ * @param {string} message Optional message that will be used in case wait was unsucessful.
+ * 
+ * @returns webdriver.promise.Promise that will be resolved/rejected when wait was finished.
+ */
+browser.explWait = function (predicate, timeout, message) {
+    return browser.manage().timeouts().implicitlyWait(0).then(()=> {
+        return browser.wait(predicate, timeout, message)
+            .then(undefined,
+                (err)=> {
+                    browser.manage().timeouts().implicitlyWait(implicitWaitTime)
+                    throw err
+                }
+            )
+    })
 }
-
-function _throghTimeNotSpecified(element) {
-    throw new Error(`WaitReady expected element ` + 
-`${element.locator().toString()} to be present and visible.`)
-}
-
-function _timeNotSpecified() {
-    throw new Error(`waitReady didn't get obligatory wait time argument`)
-}
-
-function _waitForElementToBePresentAndDisplayed(element, explicitWaitTime) {
-    return browser.wait(() => {
-        return element.isPresent()
-            .then(present => !present ? false : element.isDisplayed());
-    }, explicitWaitTime)
-}
-
-function _explicitlyWait(element, explicitWaitTime) {
-    _setImplicitWaitTime(0);
-    return _waitForElementToBePresentAndDisplayed(element, explicitWaitTime)
-        .then(present => {
-            setTimeout(() => _setImplicitWaitTime(implicitWaitTime), 1);
-            return true;
-        })
-        .catch(missing => {
-            _setImplicitWaitTime(implicitWaitTime);
-            return false;
-        })
-}
-
-ElementFinder.prototype.waitReady = function (explicitWaitTime) {
-    explicitWaitTime = explicitWaitTime || _throghTimeNotSpecified();
-    _explicitlyWait(this, explicitWaitTime)
-        .then(elementIsVisible => {
-            if (!elementIsVisible) _throwNoElementFoundError(this);
-        });
-    return this;
-};
