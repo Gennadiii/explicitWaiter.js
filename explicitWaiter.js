@@ -24,7 +24,10 @@ const implicitWaitTime = browser.params.implicitWaitTimeout || 0;
 browser.explWait = function (predicate, timeout, message) {
     return browser.manage().timeouts().implicitlyWait(0).then(()=> {
         return browser.wait(predicate, timeout, message)
-            .then(undefined,
+            .then(
+                ()=>{
+                    browser.manage().timeouts().implicitlyWait(implicitWaitTime)
+                },
                 (err)=> {
                     browser.manage().timeouts().implicitlyWait(implicitWaitTime)
                     throw err
